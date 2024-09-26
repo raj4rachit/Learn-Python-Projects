@@ -1,0 +1,65 @@
+<div class="alert alert-success">Files successfully uploaded.</div>
+{% if uploaded_files %}
+    <h2 class="mt-5">Uploaded Files</h2>
+    <ul>
+        {% for filename in uploaded_files %}
+            <li>{{ filename }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2 class="mt-5">Extracted Information</h2>
+    {% for item in context_data %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5>File: {{ uploaded_files[item.index] }}</h5>
+            </div>
+            <div class="card-body">
+                <h5>Extracted Text:</h5>
+                <pre>{{ item.pdf_text }}</pre>
+
+                <h5>Data:</h5>
+                <ul>
+                    {% for key, value in item.extracted_data.items() %}
+                        <li>{{key}}: {{value}}</li>
+                    {% endfor %}
+                </ul>
+
+<!--                <h5>Phone Numbers:</h5>-->
+<!--                <ul>-->
+<!--                    {% for number in item.extracted_data['phone_numbers'] %}-->
+<!--                    <li>{{ number }}</li>-->
+<!--                    {% endfor %}-->
+<!--                </ul>-->
+
+<!--                <h5>Emails:</h5>-->
+<!--                <ul>-->
+<!--                    {% for email in item.extracted_data['emails'] %}-->
+<!--                    <li>{{ email }}</li>-->
+<!--                    {% endfor %}-->
+<!--                </ul>-->
+
+<!--                <h5>Names:</h5>-->
+<!--                <ul>-->
+<!--                    {% for name in item.extracted_data['names'] %}-->
+<!--                    <li>{{ name }}</li>-->
+<!--                    {% endfor %}-->
+<!--                </ul>-->
+
+<!--                <h5>Invoice Numbers:</h5>-->
+<!--                <ul>-->
+<!--                    {% for invoice in item.extracted_data['invoice_numbers'] %}-->
+<!--                    <li>{{ invoice }}</li>-->
+<!--                    {% endfor %}-->
+<!--                </ul>-->
+
+<!--                <h5>Item Details:</h5>-->
+<!--                <ul>-->
+<!--                    {% for itemDetail in item.extracted_data['item_details'] %}-->
+<!--                    <li>{{ itemDetail }}</li>-->
+<!--                    {% endfor %}-->
+<!--                </ul>-->
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}
+

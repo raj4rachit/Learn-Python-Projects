@@ -1,0 +1,13 @@
+[
+  {
+    "name": "NAME1",
+    "birth_month": "1",
+    "birth_date": "12"
+  },
+  {
+    "name": "NAME2",
+    "birth_month": "5",
+    "birth_date": "3"
+  }
+
+]

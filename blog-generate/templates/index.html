@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Blog Content Generator</title>
+</head>
+<body>
+    <h1>AI-Powered SEO Blog Content Generator</h1>
+    <form id="content-form">
+        <label for="prompt">Enter your topic or keywords:</label>
+        <input type="text" id="prompt" name="prompt" required>
+        <button type="submit">Generate Content</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('content-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const prompt = document.getElementById('prompt').value;
+            const response = await fetch('/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    'prompt': prompt
+                })
+            });
+            if (response.ok) {
+                const result = await response.text();
+                document.getElementById('result').innerText = result;
+            } else {
+                const error = await response.json();
+                document.getElementById('result').innerText = `Error: ${error.error}`;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OpenAI Chatbot</title>
+    <script>
+        async function sendMessage() {
+            const message = document.getElementById('message').value;
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ prompt: message })
+            });
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let result = '';
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                result += decoder.decode(value);
+                document.getElementById('response').innerText = result;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Chat with OpenAI</h1>
+    <input type="text" id="message" placeholder="Type your message here">
+    <button onclick="sendMessage()">Send</button>
+    <div id="response"></div>
+</body>
+</html>

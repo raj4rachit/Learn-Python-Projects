@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:;base64,=">
+    <title>Home</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: #fff;
+        }
+        .navbar {
+            margin-bottom: 20px;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-wrap: wrap;
+            -ms-flex-align: center;
+            -ms-flex-pack: justify;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+            align-items: center;
+        }
+        .navbar-brand img {
+            height: 50px; /* Adjust logo size */
+        }
+        .navbar-nav {
+            display: flex;
+            -ms-flex-direction: column;
+            justify-content: flex-end;
+            flex-direction: row;
+        }
+        .navbar-nav .nav-item {
+            margin-left: 10px; /* Space between menu items */
+        }
+        .navbar-nav .nav-item a{
+            color: #0a0a0a !important;
+        }
+        .content {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+        }
+        .user-info {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+        .user-info img {
+            border-radius: 50%;
+            width: 75px;
+            height: 75px;
+            object-fit: cover;
+        }
+        .user-info p{
+            font-size: 18px;
+            font-weight: 500;
+            display: contents;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .button-group button {
+            background-color: #ffffff;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .button-group button:hover {
+            background-color: #f0f0f0;
+        }
+        footer {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            color: #fff;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-gp{
+		    display: flex;
+    justify-content: center;
+    flex-direction: column;
+	}
+
+		@media (min-width: 992px) {
+    .navbar-expand-lg .navbar-collapse {
+
+        justify-content: flex-end;
+    }
+}
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-light">
+        <a class="navbar-brand" href="#">
+            <img src="{{ user.logo }}" alt="Logo">
+        </a>
+        <div class="navbar-collapse collapse show" id="navbarNav"> <!-- Always show the navbar menu -->
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout" id="logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container-full">
+        <div class="row">
+            <div class="col-md-4 col-sm-12 pb-3">
+                <div class="user-info">
+                    <img id="user-image" src="{{ user.user.profile_picture_url }}" alt="User Image">
+                    <p>Welcome! <br> {{ user.user.full_name }}</p>
+                </div>
+            </div>
+            <div class="col-md-8 col-sm-12 pb-3 btn-gp">
+                <div class="button-group">
+                    {% if user.time_sheet.clock.start_time %}
+                        <button class="btn">Clock Out</button>
+                        <button class="btn">Start Break</button>
+                    {% elif not user.time_sheet.clock.start_time %}
+                        <button class="btn">Clock In</button>
+                    {% elif user.time_sheet.break %}
+                        <button class="btn">End Break</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p id="date-time"></p>
+        <p id="version-info">Version: 1.0.0</p>
+        <p>&copy; 2024 Technobrains. All rights reserved.</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to update the date and time
+            function updateDateTime() {
+                var now = new Date();
+                var day = now.getDate().toString().padStart(2, '0');
+                var month = (now.getMonth() + 1).toString().padStart(2, '0');
+                var year = now.getFullYear();
+                var hours = now.getHours().toString().padStart(2, '0');
+                var minutes = now.getMinutes().toString().padStart(2, '0');
+                var seconds = now.getSeconds().toString().padStart(2, '0');
+                var dateTimeString = `${year}-${month}-${day}, ${hours}:${minutes}:${seconds}`;
+                document.getElementById('date-time').textContent = `${dateTimeString}`;
+            }
+
+            // Initial call to set the date and time immediately
+            updateDateTime();
+            // Update the date and time every second
+            setInterval(updateDateTime, 1000);
+
+
+            var token = localStorage.getItem('token');
+
+            if (token) {
+                document.getElementById('user-token').textContent = token;
+            } else {
+                window.location.href = '/login';
+            }
+
+            document.getElementById('logout').onclick = function() {
+                localStorage.removeItem('token');
+
+                // Remove the token cookie
+                document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+
+                window.location.href = '/login_page';
+            };
+        });
+    </script>
+</body>
+</html>

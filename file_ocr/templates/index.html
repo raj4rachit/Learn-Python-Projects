@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Upload PDF Files</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+      .dropzone {
+        border: 2px dashed #007bff;
+        border-radius: 5px;
+        padding: 30px;
+        text-align: center;
+        color: #007bff;
+        cursor: pointer;
+      }
+      .dropzone.dragover {
+        background-color: #e9ecef;
+      }
+      #progress-wrapper {
+        display: none;
+        margin-top: 20px;
+      }
+      #progress-bar {
+        width: 0%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="mt-5">Upload PDF Files</h1>
+      <div id="dropzone" class="dropzone">
+        Drag and drop files here or click to upload
+      </div>
+      <form id="upload-form" method="post" action="/upload" enctype="multipart/form-data" class="d-none">
+        <input type="file" id="file-input" name="files" multiple accept="application/pdf">
+      </form>
+      <div id="progress-wrapper" class="progress">
+        <div id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+      <div id="upload-status" class="mt-3"></div>
+
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+      $(document).ready(function() {
+        var dropzone = $('#dropzone');
+        var fileInput = $('#file-input');
+        var uploadForm = $('#upload-form');
+        var progressBar = $('#progress-bar');
+        var progressWrapper = $('#progress-wrapper');
+        var uploadStatus = $('#upload-status');
+
+        dropzone.on('click', function() {
+          fileInput.click();
+        });
+
+        fileInput.on('change', function() {
+          handleFiles(this.files);
+        });
+
+        dropzone.on('dragover', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          $(this).addClass('dragover');
+        });
+
+        dropzone.on('dragleave', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          $(this).removeClass('dragover');
+        });
+
+        dropzone.on('drop', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          $(this).removeClass('dragover');
+          var files = e.originalEvent.dataTransfer.files;
+          handleFiles(files);
+        });
+
+        function handleFiles(files) {
+          var formData = new FormData();
+          for (var i = 0; i < files.length; i++) {
+            formData.append('files', files[i]);
+          }
+          uploadFiles(formData);
+        }
+
+        function uploadFiles(formData) {
+          $.ajax({
+            xhr: function() {
+              var xhr = new window.XMLHttpRequest();
+              xhr.upload.addEventListener('progress', function(evt) {
+                if (evt.lengthComputable) {
+                  var percentComplete = Math.round((evt.loaded / evt.total) * 100);
+                  progressWrapper.show();
+                  progressBar.width(percentComplete + '%');
+                  progressBar.attr('aria-valuenow', percentComplete);
+                  progressBar.text(percentComplete + '%');
+                }
+              }, false);
+              return xhr;
+            },
+            type: 'POST',
+            url: '/upload',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(data) {
+              progressWrapper.hide();
+              uploadStatus.html(data);
+              progressBar.width('0%');
+              progressBar.attr('aria-valuenow', 0);
+              progressBar.text('');
+            },
+            error: function() {
+              progressWrapper.hide();
+              uploadStatus.html('<div class="alert alert-danger">An error occurred while uploading the files.</div>');
+              progressBar.width('0%');
+              progressBar.attr('aria-valuenow', 0);
+              progressBar.text('');
+            }
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
